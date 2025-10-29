@@ -1,14 +1,15 @@
-from src import app_graph, State
+from src import app_graph, State, APIRequest, APIResponse
 from fastapi import FastAPI
 
 app = FastAPI()
 #uvicorn main:app --reload
 
 
-@app.get("/{user_input}")
-def read_root(user_input: str):
+@app.post("/chat}")
+def read_root(request: APIRequest):
     data: State = {
-        'user_input': user_input
+        'user_input': request.user_input
     }
-    result = app_graph.invoke(data)
-    return result
+    result: State = app_graph.invoke(data)
+    api_response = APIResponse(system_output=result['system_output'])
+    return api_response
