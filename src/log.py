@@ -2,12 +2,15 @@ import logging
 from functools import wraps
 import time
 
+
 def short_repr(obj, max_length=10):
     r = repr(obj)
     return r if len(r) <= max_length else r[:max_length] + '...'
 
+
 logging.basicConfig(level=logging.INFO,
                     format=f"%(asctime)s - %(levelname)s - %(message)-50s")
+
 
 def record_log(func):
     @wraps(func)
