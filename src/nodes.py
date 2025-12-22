@@ -1,6 +1,6 @@
 from .state import State
 from .models import LLM, ChatClassify, IntentClassify, CHAT_CLASSIFY_TEMPLATE, INTENT_CLASSIFY_TEMPLATE, \
-    ASK_TO_CONNECT_STAFF_TEMPLATE, PRODUCT_CONSULTING_TEMPLATE, ORDER_STATUS_PROMPT_TEMPLATE
+    ASK_TO_CONNECT_STAFF_TEMPLATE, PRODUCT_CONSULTING_TEMPLATE, ORDER_STATUS_PROMPT_TEMPLATE, NATURAL_RESPONSE_TEMPLATE
 from .log import record_log
 from config import MODEL, PRODUCTS_endpoint, ORDER_STATUS_endpoint
 from langchain_core.prompts import PromptTemplate
@@ -35,16 +35,15 @@ def chat_classify(data: State):
 def natural_response(data: State):
     user_input = data['user_input']
     llm = data['model']
-    natural_response = llm.singleChat(user_input)
+    prompt = PromptTemplate.from_template(NATURAL_RESPONSE_TEMPLATE).format(
+        user_input=user_input,
+    )
+    natural_response = llm.singleChat(prompt)
+    # natural_response = "Xin lỗi, chúng tôi chỉ hỗ trợ trả lời các thông tin liên quan đến mua hàng. Bạn có câu hỏi nào khác không?"
     extra_data: State = {
         'system_output': natural_response
     }
     return extra_data
-
-
-# def meet_staff(data: State):
-#     extra_data: State = {}
-#     return extra_data
 
 @record_log
 def intent_classify(data: State):
@@ -104,7 +103,6 @@ def is_login(data: State):
     is_login = False
     if user_id:
         is_login = True
-
     extra_data: State = {
         'is_login': is_login,
     }

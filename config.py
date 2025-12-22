@@ -8,7 +8,7 @@ with open(os.path.join(PROJECT_PATH, "config.yaml"), "r") as f:
     cfg = yaml.safe_load(f)
 
 MODELS = cfg.get('models')
-MODEL = cfg.get('models')[1] # Du an nay dung 1 model dau tien thoi
+MODEL = cfg.get('models')[3] # Du an nay dung 1 model dau tien thoi
 
 db_config = cfg.get('db_config')
 MYSQL_USER = db_config.get('MYSQL_USER')
