@@ -6,10 +6,10 @@ models:
   - models/gemini-2.5-pro
 db_config:
   MYSQL_USER: "root"
-  MYSQL_PASS: "abcxyz"
+  MYSQL_PASS: "M!nh!s12004"
   MYSQL_HOST: "localhost"
   MYSQL_PORT: "3306"
-  MYSQL_DB: "clotherteamdb"
+  MYSQL_DB: "test"
 
 endpoint:
   PRODUCTS: "http://127.0.0.1:8000/products"

@@ -1,20 +1,37 @@
 from .state import State
 from .models import LLM, ChatClassify, IntentClassify, CHAT_CLASSIFY_TEMPLATE, INTENT_CLASSIFY_TEMPLATE, \
-    ASK_TO_CONNECT_STAFF_TEMPLATE, PRODUCT_CONSULTING_TEMPLATE, ORDER_STATUS_PROMPT_TEMPLATE, NATURAL_RESPONSE_TEMPLATE
+    ASK_TO_CONNECT_STAFF_TEMPLATE, PRODUCT_CONSULTING_TEMPLATE, ORDER_STATUS_PROMPT_TEMPLATE, NATURAL_RESPONSE_TEMPLATE, SYSTEM_MESSAGE
 from .log import record_log
 from config import MODEL, PRODUCTS_endpoint, ORDER_STATUS_endpoint
 from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import SystemMessage, HumanMessage
 import requests
 import json
+
+
 
 @record_log
 def init(data: State):
     llm = LLM(model=MODEL)
+
+    response = requests.get(PRODUCTS_endpoint)
+    json_product = response.json()
+    products_str = json.dumps(json_product, ensure_ascii=False, indent=2)
+    sys_mes_str = PromptTemplate.from_template(SYSTEM_MESSAGE).format(
+        products=products_str
+    )
+    print(sys_mes_str)
+    user_input = data['user_input']
+    print(user_input)
+    his = [SystemMessage(content=sys_mes_str), HumanMessage(content=user_input)]
+    sys_out = llm.hisChat(his)
+
     extra_data: State = {
-        'model': llm,
-        'system_output': 'Đây là câu trả lời mặc định',
+        # 'model': llm,
+        'system_output': sys_out,
     }
     return extra_data
+
 
 
 @record_log
@@ -150,10 +167,10 @@ def recommend_product(data: State):
     }
     return extra_data
 
-# def final(data: State):
-#     llm = data['model']
-#     system_output = llm.singleChat(data['user_input'])
-#     extra_data: State = {
-#         'system_output': system_output
-#     }
-#     return extra_data
+def final(data: State):
+    # llm = data['model']
+    # system_output = llm.singleChat(data['user_input'])
+    extra_data: State = {
+
+    }
+    return extra_data
