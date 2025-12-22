@@ -27,7 +27,7 @@ app.add_middleware(
 def read_root(request: APIRequest):
     data: State = {
         'user_input': request.user_input,
-        'is_login': False,
+        'user_id': request.user_id,
     }
     result: State = app_graph.invoke(data)
     api_response = APIResponse(system_output=result['system_output'])
@@ -54,15 +54,15 @@ def get_products():
     return {"data": rows}
 
 @app.get("/orderStatus/{user_id}")
-def get_orderStatus(user_id:str):
-    query_text = GET_ORDER_STATUS.format(user_id = user_id)
+def get_orderStatus(user_id: str):
     try:
         with engine_mysql_debug.connect() as connection:
-            result = connection.execute(text(query_text))
+            # Truyền tham số thay vì format
+            result = connection.execute(text(GET_ORDER_STATUS), {"user_id": user_id})
             rows = [dict(row._mapping) for row in result]
             print(f"Ket noi thanh cong, csdl tra ve chi tiet don hang\n {rows}")
     except Exception as e:
         print(f'Loi khi thuc thi truy van: {e}')
         return {"error": str(e)}
-    # Trả về JSON
+
     return {"data": rows}

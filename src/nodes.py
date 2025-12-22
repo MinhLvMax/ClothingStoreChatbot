@@ -14,17 +14,27 @@ import json
 def init(data: State):
     llm = LLM(model=MODEL)
 
-    response = requests.get(PRODUCTS_endpoint)
-    json_product = response.json()
+
+    response_product = requests.get(PRODUCTS_endpoint)
+    json_product = response_product.json()
     products_str = json.dumps(json_product, ensure_ascii=False, indent=2)
     sys_mes_str = PromptTemplate.from_template(SYSTEM_MESSAGE).format(
         products=products_str
     )
+
+    response_status = requests.get(ORDER_STATUS_endpoint, params={'user_id': data['user_id']})
+    json_status = response_status.json()
+    order_status_str = json.dumps(json_status, ensure_ascii=False, indent=2)
+    sys_mes_str += "Đây là trạng thái đơn hàng của người dùng:\n" + order_status_str
+
     print(sys_mes_str)
     user_input = data['user_input']
     print(user_input)
     his = [SystemMessage(content=sys_mes_str), HumanMessage(content=user_input)]
-    sys_out = llm.hisChat(his)
+    try:
+        sys_out = llm.hisChat(his)
+    except Exception as e:
+        sys_out = "Hết lượt chat miễn phí từ gemini mỗi phút \n" + str(e)
 
     extra_data: State = {
         # 'model': llm,
